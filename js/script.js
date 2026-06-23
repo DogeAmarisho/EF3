@@ -147,7 +147,7 @@ gameForm.addEventListener('submit', (event) => {
     const newId = Date.now().toString();
 
     // 1. Lo renderizamos en pantalla
-    renderGameCard(newId, nameValue, platformValue, hoursValue);
+    renderGameCard(newId, nameValue, platformValue, hoursValue, dateValue);
 
     // 2. Lo guardamos en el LocalStorage para que persista
     const newGameObj = {
@@ -172,17 +172,22 @@ gameForm.addEventListener('submit', (event) => {
 // ==========================================
 // FUNCIÓN REUTILIZABLE: RENDERIZAR TARJETA 
 // ==========================================
-function renderGameCard(id, name, platform, hours) {
+function renderGameCard(id, name, platform, hours, date) { // <-- Agregamos 'date' aquí
     const card = document.createElement('div');
     card.classList.add('game-card');
-    card.dataset.id = id; // Guardamos el ID en el elemento HTML
+    card.dataset.id = id;
 
     const title = document.createElement('h3');
     title.textContent = name; 
 
     const detailsInfo = document.createElement('p');
     const displayHours = (hours === '' || hours === null) ? '0' : hours; 
-    detailsInfo.innerHTML = `<strong>${platform}</strong> | ${displayHours} hrs jugadas`;
+    
+    // Formateamos la fecha si existe, de lo contrario mostramos un texto por defecto
+    const displayDate = date ? `Adquirido el: ${date}` : 'Fecha no especificada';
+
+    // Inyectamos la plataforma, horas y ahora la fecha
+    detailsInfo.innerHTML = `<strong>${platform}</strong> | ${displayHours} hrs jugadas<br><small>${displayDate}</small>`;
 
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Eliminar';
@@ -190,12 +195,8 @@ function renderGameCard(id, name, platform, hours) {
 
     // EVENTO 3: 'click'
     deleteBtn.addEventListener('click', () => {
-        // 1. Eliminar del DOM
         card.remove(); 
-        
-        // 2. Eliminar del LocalStorage
         removeGameFromStorage(id);
-
         if (gameList.querySelectorAll('.game-card').length === 0 && emptyMsg) {
             emptyMsg.style.display = 'block';
         }
@@ -239,7 +240,7 @@ function loadGamesFromStorage() {
             if (emptyMsg) emptyMsg.style.display = 'none';
             // Renderizamos cada juego guardado
             gamesData.forEach(game => {
-                renderGameCard(game.id, game.name, game.platform, game.hours);
+                renderGameCard(game.id, game.name, game.platform, game.hours, game.date);
             });
         }
     }
