@@ -37,13 +37,13 @@ Debido al uso de la API `Fetch` para el consumo de un archivo JSON local, la apl
 *(Reemplazar `[ruta_imagen]` por la ruta de tus capturas locales en la carpeta del repositorio)*
 
 **1. Estado Inicial y Carga de Datos (Fetch)**
-![Carga inicial de datos](ruta_imagen_1.jpg)
+![Persistencia](ruta_imagen_1.jpg)
 
 **2. Validaciones de Formulario y Feedback Visual**
-![Validación de formulario] (EF3/assets/Error.png)
+![Validación](EF3/assets/Error.png)
 
 **3. Renderizado Dinámico de Elementos**
-![Inserción de nueva tarjeta](ruta_imagen_3.jpg)
+![Estados](ruta_imagen_3.jpg)
 
 ---
 
