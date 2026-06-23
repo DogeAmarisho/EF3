@@ -141,17 +141,36 @@ gameForm.addEventListener('submit', (event) => {
     // ==========================================
     
     if (emptyMsg) emptyMsg.style.display = 'none';
+renderGameCard(nameValue, platformValue, hoursValue);
+gameForm.reset();
+gameForm.style.borderLeft = 'none';
+// ... (resto de la limpieza de clases)
 
+    // Reseteamos el formulario y los estados visuales
+    gameForm.reset();
+    gameForm.style.borderLeft = 'none';
+    
+    // Limpiamos las clases de validación de todos los inputs
+    const allInputs = gameForm.querySelectorAll('input, select');
+    allInputs.forEach(input => {
+        input.classList.remove('is-valid', 'is-invalid');
+    });
+});
+
+// ==========================================
+// FUNCIÓN REUTILIZABLE: RENDERIZAR TARJETA 
+// ==========================================
+// Usaremos esta función tanto para los datos del JSON como para los del formulario
+function renderGameCard(name, platform, hours) {
     const card = document.createElement('div');
     card.classList.add('game-card');
 
     const title = document.createElement('h3');
-    title.textContent = nameValue; 
+    title.textContent = name; 
 
     const detailsInfo = document.createElement('p');
-    // Si no puso horas, mostramos 0 por defecto
-    const displayHours = hoursValue === '' ? '0' : hoursValue; 
-    detailsInfo.innerHTML = `<strong>${platformValue}</strong> | ${displayHours} hrs jugadas`;
+    const displayHours = (hours === '' || hours === null) ? '0' : hours; 
+    detailsInfo.innerHTML = `<strong>${platform}</strong> | ${displayHours} hrs jugadas`;
 
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Eliminar';
@@ -168,14 +187,56 @@ gameForm.addEventListener('submit', (event) => {
     card.appendChild(detailsInfo);
     card.appendChild(deleteBtn);
     gameList.appendChild(card);
+}
 
-    // Reseteamos el formulario y los estados visuales
-    gameForm.reset();
-    gameForm.style.borderLeft = 'none';
-    
-    // Limpiamos las clases de validación de todos los inputs
-    const allInputs = gameForm.querySelectorAll('input, select');
-    allInputs.forEach(input => {
-        input.classList.remove('is-valid', 'is-invalid');
-    });
-});
+// ==========================================
+// FETCH ASÍNCRONO A JSON LOCAL (BLOQUE 4)
+// ==========================================
+async function loadInitialData() {
+    // 1. Estado de carga visual (Buena práctica de usabilidad)
+    const loadingMsg = document.createElement('p');
+    loadingMsg.textContent = 'Cargando tu catálogo de juegos...';
+    loadingMsg.classList.add('empty-msg'); 
+    gameList.appendChild(loadingMsg);
+
+    if (emptyMsg) emptyMsg.style.display = 'none';
+
+    try {
+        // 2. Ejecutamos el fetch a nuestro archivo local estructurado
+        const response = await fetch('./data/datos.json');
+        
+        // 3. Verificamos que la respuesta HTTP sea correcta (Estado 200-299)
+        if (!response.ok) {
+            throw new Error(`Error de red o archivo no encontrado: ${response.status}`);
+        }
+
+        // 4. Parseamos la respuesta a JSON
+        const gamesData = await response.json();
+        
+        loadingMsg.remove(); // Quitamos el mensaje de carga
+
+        // 5. Renderizamos los datos obtenidos directamente en el DOM
+        if (gamesData.length > 0) {
+            gamesData.forEach(game => {
+                renderGameCard(game.name, game.platform, game.hours);
+            });
+        } else {
+            if (emptyMsg) emptyMsg.style.display = 'block';
+        }
+
+    } catch (error) {
+        // 6. Control riguroso de excepciones sin romper la usabilidad
+        loadingMsg.remove();
+        console.error('Fallo al cargar los datos iniciales:', error);
+        
+        // Mostramos un mensaje amigable al usuario en la interfaz
+        const errorDOM = document.createElement('p');
+        errorDOM.textContent = 'No se pudo cargar el catálogo inicial. Pero no te preocupes, puedes agregar juegos manualmente.';
+        errorDOM.style.color = 'var(--error-color)';
+        errorDOM.classList.add('empty-msg');
+        gameList.appendChild(errorDOM);
+    }
+}
+
+// Ejecutamos la carga inicial en cuanto el documento esté listo
+document.addEventListener('DOMContentLoaded', loadInitialData);
