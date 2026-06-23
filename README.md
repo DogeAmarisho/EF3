@@ -40,7 +40,7 @@ Debido al uso de la API `Fetch` para el consumo de un archivo JSON local, la apl
 ![Carga inicial de datos](ruta_imagen_1.jpg)
 
 **2. Validaciones de Formulario y Feedback Visual**
-![Validación de formulario](ruta_imagen_2.jpg)
+![Validación de formulario] (EF3/assets/Error.png)
 
 **3. Renderizado Dinámico de Elementos**
 ![Inserción de nueva tarjeta](ruta_imagen_3.jpg)
