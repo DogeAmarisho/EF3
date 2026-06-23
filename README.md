@@ -34,17 +34,14 @@ Debido al uso de la API `Fetch` para el consumo de un archivo JSON local, la apl
 
 ## Evidencias Visuales de Funcionamiento
 
-*(Reemplazar `[ruta_imagen]` por la ruta de tus capturas locales en la carpeta del repositorio)*
-
 **1. Estado Inicial y Carga de Datos (Fetch)**
-![Persistencia](ruta_imagen_1.jpg)
+![Carga inicial y persistencia de datos](assets/Persistencia.png)
 
 **2. Validaciones de Formulario y Feedback Visual**
-![Validación](EF3/assets/Error.png)
+![Validación de formulario y errores](assets/Error.png)
 
-**3. Renderizado Dinámico de Elementos**
-![Estados](ruta_imagen_3.jpg)
-
+**3. Renderizado Dinámico de Elementos y Estados**
+![Estados de la aplicación y tarjetas](assets/Estados.png)
 ---
 
 ## Autoevaluación de Criterios Institucionales
