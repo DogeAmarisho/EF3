@@ -49,6 +49,7 @@ function setFieldStatus(inputElement, errorElement, isValid, errorMessage = '') 
 // EVENTO PRINCIPAL: SUBMIT Y VALIDACIONES
 // ==========================================
 
+// EVENTO 2: 'submit'
 gameForm.addEventListener('submit', (event) => {
     // 1. Control del Envío Obligatorio: Detiene el refresco de la página 
     event.preventDefault(); 
@@ -71,7 +72,7 @@ gameForm.addEventListener('submit', (event) => {
 
     let isFormValid = true;
 
-    // --- REGLA 2 Y 3: Longitud y Regex (Nombre del Juego) --- [cite: 63, 64]
+    // --- REGLA 2 Y 3: Longitud y Regex (Nombre del Juego) ---
     const nameRegex = /^[a-zA-Z0-9\s:\-]+$/;
     if (nameValue.length < 2 || nameValue.length > 50) {
         setFieldStatus(nameInput, errorName, false, 'El nombre debe tener entre 2 y 50 caracteres.');
@@ -137,33 +138,44 @@ gameForm.addEventListener('submit', (event) => {
     }
 
     // ==========================================
-    // SI TODO ES VÁLIDO: PROCEDEMOS CON LA CREACIÓN EN EL DOM (Bloque 2)
+    // SI TODO ES VÁLIDO: PROCEDEMOS CON LA CREACIÓN
     // ==========================================
     
     if (emptyMsg) emptyMsg.style.display = 'none';
-renderGameCard(nameValue, platformValue, hoursValue);
-gameForm.reset();
-gameForm.style.borderLeft = 'none';
-// ... (resto de la limpieza de clases)
 
-    // Reseteamos el formulario y los estados visuales
+    // Generamos un ID único basado en la marca de tiempo actual
+    const newId = Date.now().toString();
+
+    // 1. Lo renderizamos en pantalla
+    renderGameCard(newId, nameValue, platformValue, hoursValue);
+
+    // 2. Lo guardamos en el LocalStorage para que persista
+    const newGameObj = {
+        id: newId,
+        name: nameValue,
+        platform: platformValue,
+        hours: hoursValue,
+        date: dateValue
+    };
+    saveGameToStorage(newGameObj);
+
+    // Reseteamos el formulario
     gameForm.reset();
     gameForm.style.borderLeft = 'none';
     
-    // Limpiamos las clases de validación de todos los inputs
     const allInputs = gameForm.querySelectorAll('input, select');
     allInputs.forEach(input => {
         input.classList.remove('is-valid', 'is-invalid');
     });
-});
+}); // <--- AQUÍ ESTABA EL ERROR: Faltaba cerrar el evento submit
 
 // ==========================================
 // FUNCIÓN REUTILIZABLE: RENDERIZAR TARJETA 
 // ==========================================
-// Usaremos esta función tanto para los datos del JSON como para los del formulario
-function renderGameCard(name, platform, hours) {
+function renderGameCard(id, name, platform, hours) {
     const card = document.createElement('div');
     card.classList.add('game-card');
+    card.dataset.id = id; // Guardamos el ID en el elemento HTML
 
     const title = document.createElement('h3');
     title.textContent = name; 
@@ -176,8 +188,14 @@ function renderGameCard(name, platform, hours) {
     deleteBtn.textContent = 'Eliminar';
     deleteBtn.classList.add('delete-btn');
 
+    // EVENTO 3: 'click'
     deleteBtn.addEventListener('click', () => {
+        // 1. Eliminar del DOM
         card.remove(); 
+        
+        // 2. Eliminar del LocalStorage
+        removeGameFromStorage(id);
+
         if (gameList.querySelectorAll('.game-card').length === 0 && emptyMsg) {
             emptyMsg.style.display = 'block';
         }
@@ -190,53 +208,42 @@ function renderGameCard(name, platform, hours) {
 }
 
 // ==========================================
-// FETCH ASÍNCRONO A JSON LOCAL (BLOQUE 4)
+// PERSISTENCIA CON LOCALSTORAGE (Opción 1)
 // ==========================================
-async function loadInitialData() {
-    // 1. Estado de carga visual (Buena práctica de usabilidad)
-    const loadingMsg = document.createElement('p');
-    loadingMsg.textContent = 'Cargando tu catálogo de juegos...';
-    loadingMsg.classList.add('empty-msg'); 
-    gameList.appendChild(loadingMsg);
 
-    if (emptyMsg) emptyMsg.style.display = 'none';
+// Función para guardar un nuevo juego en LocalStorage
+function saveGameToStorage(gameObj) {
+    // Obtenemos el arreglo actual o creamos uno vacío si no existe (caso de borde)
+    let gamesData = JSON.parse(localStorage.getItem('misJuegos')) || [];
+    gamesData.push(gameObj);
+    localStorage.setItem('misJuegos', JSON.stringify(gamesData));
+}
 
-    try {
-        // 2. Ejecutamos el fetch a nuestro archivo local estructurado
-        const response = await fetch('./data/datos.json');
+// Función para eliminar un juego del LocalStorage
+function removeGameFromStorage(id) {
+    let gamesData = JSON.parse(localStorage.getItem('misJuegos')) || [];
+    // Filtramos para mantener todos menos el que queremos borrar
+    gamesData = gamesData.filter(game => game.id !== id);
+    localStorage.setItem('misJuegos', JSON.stringify(gamesData));
+}
+
+// Función para cargar los juegos al iniciar la página
+function loadGamesFromStorage() {
+    // Recuperar y parsear los datos de forma segura
+    const storedGames = localStorage.getItem('misJuegos');
+    
+    if (storedGames) {
+        const gamesData = JSON.parse(storedGames);
         
-        // 3. Verificamos que la respuesta HTTP sea correcta (Estado 200-299)
-        if (!response.ok) {
-            throw new Error(`Error de red o archivo no encontrado: ${response.status}`);
-        }
-
-        // 4. Parseamos la respuesta a JSON
-        const gamesData = await response.json();
-        
-        loadingMsg.remove(); // Quitamos el mensaje de carga
-
-        // 5. Renderizamos los datos obtenidos directamente en el DOM
         if (gamesData.length > 0) {
+            if (emptyMsg) emptyMsg.style.display = 'none';
+            // Renderizamos cada juego guardado
             gamesData.forEach(game => {
-                renderGameCard(game.name, game.platform, game.hours);
+                renderGameCard(game.id, game.name, game.platform, game.hours);
             });
-        } else {
-            if (emptyMsg) emptyMsg.style.display = 'block';
         }
-
-    } catch (error) {
-        // 6. Control riguroso de excepciones sin romper la usabilidad
-        loadingMsg.remove();
-        console.error('Fallo al cargar los datos iniciales:', error);
-        
-        // Mostramos un mensaje amigable al usuario en la interfaz
-        const errorDOM = document.createElement('p');
-        errorDOM.textContent = 'No se pudo cargar el catálogo inicial. Pero no te preocupes, puedes agregar juegos manualmente.';
-        errorDOM.style.color = 'var(--error-color)';
-        errorDOM.classList.add('empty-msg');
-        gameList.appendChild(errorDOM);
     }
 }
 
-// Ejecutamos la carga inicial en cuanto el documento esté listo
-document.addEventListener('DOMContentLoaded', loadInitialData);
+// Ejecutamos la carga al iniciar
+document.addEventListener('DOMContentLoaded', loadGamesFromStorage);
