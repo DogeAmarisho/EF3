@@ -3,15 +3,21 @@
         "id": 1,
         "name": "Minecraft",
         "platform": "PC",
-        "hours": 350,
-        "date": "2020-05-15"
+        "hours": 5000,
+        "date": "2014-03-15"
     },
     {
         "id": 2,
         "name": "Hollow Knight",
         "platform": "PC",
-        "hours": 45,
+        "hours": 5,
         "date": "2022-11-20"
+    },
+    {
+        "id": 3,
+        "name": "Geometry Dash",
+        "platform": "PC",
+        "hours": 2623,
+        "date": "2020-09-17"
     }
-    
 ]
