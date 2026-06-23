@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Colección de Juegos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <h1>Mi Colección de Juegos</h1>
+        <p>Registra y organiza tu biblioteca</p>
+    </header>
+
+    <main class="container">
+        <section class="form-section">
+            <h2>Agregar Nuevo Juego</h2>
+            <form id="game-form" novalidate>
+                
+                <div class="form-group">
+                    <label for="game-name">Nombre del Juego:</label>
+                    <input type="text" id="game-name" placeholder="Ej. The Legend of Zelda">
+                    <span class="error-message" id="error-name"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="game-platform">Plataforma:</label>
+                    <select id="game-platform">
+                        <option value="">Selecciona una plataforma...</option>
+                        <option value="PC">PC</option>
+                        <option value="PlayStation">PlayStation</option>
+                        <option value="Xbox">Xbox</option>
+                        <option value="Nintendo">Nintendo Switch</option>
+                    </select>
+                    <span class="error-message" id="error-platform"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="game-hours">Horas Jugadas:</label>
+                    <input type="number" id="game-hours" placeholder="Ej. 45" min="0">
+                    <span class="error-message" id="error-hours"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="game-date">Fecha de Adquisición:</label>
+                    <input type="date" id="game-date">
+                    <span class="error-message" id="error-date"></span>
+                </div>
+
+                <button type="submit" id="submit-btn">Guardar Juego</button>
+            </form>
+        </section>
+
+        <section class="catalog-section">
+            <h2>Mi Catálogo</h2>
+            <div id="game-list" class="game-grid">
+                <p class="empty-msg">Tu catálogo está vacío. ¡Agrega un juego!</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>Evaluación Final Unidad III - eProgramación Web</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
