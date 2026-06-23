@@ -12,12 +12,6 @@
         "platform": "PC",
         "hours": 45,
         "date": "2022-11-20"
-    },
-    {
-        "id": 3,
-        "name": "Super Smash Bros. Ultimate",
-        "platform": "Nintendo",
-        "hours": 120,
-        "date": "2019-12-25"
     }
+    
 ]
